@@ -1,4 +1,5 @@
 #include "args.h"
+#include "config.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,18 +43,16 @@ Instruction decode(CPU *cpu) {
   return ins;
 }
 
-const int buf_size = 128;
-
 int main(int argc, char *argv[]) {
-  char *bin_path = read_args(argc, argv);
+  struct EmuConfig *conf = read_args(argc, argv);
   CPU cpu = {0};
-  FILE *f = fopen(bin_path, "r");
+  FILE *f = fopen(conf->bin_path, "r");
 
   if (f == NULL) {
     printf("Failed to read the file.\n");
     return 1;
   }
-  uint8_t buf[buf_size];
+  uint8_t buf[conf->mem_size];
   size_t n = fread(buf, 1, sizeof(buf), f);
 
   cpu.memory = buf;

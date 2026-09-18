@@ -1,16 +1,22 @@
+#include "config.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-char *read_args(int argc, char *argv[]) {
+struct EmuConfig *read_args(int argc, char *argv[]) {
   enum { CHARACTER_MODE, WORD_MODE, LINE_MODE } mode = CHARACTER_MODE;
+  int mem_size = 4096; /* 4KB by default */
 
   int opt;
-  while ((opt = getopt(argc, argv, "ilw")) != -1) {
+  while ((opt = getopt(argc, argv, "ilm:w")) != -1) {
     switch (opt) {
-    case 'i':
-      printf("-i option!!!!");
+    case 'm':
+      if (optarg == NULL) {
+        fprintf(stderr, "Usage: %s [-ilm:w] [file...]\n", argv[0]);
+        exit(EXIT_FAILURE);
+      }
+      mem_size = (int)*optarg;
       break;
     case 'l':
       mode = LINE_MODE;
@@ -19,7 +25,7 @@ char *read_args(int argc, char *argv[]) {
       mode = WORD_MODE;
       break;
     default:
-      fprintf(stderr, "Usage: %s [-ilw] [file...]\n", argv[0]);
+      fprintf(stderr, "Usage: %s [-ilm:w] [file...]\n", argv[0]);
       exit(EXIT_FAILURE);
     }
   }
@@ -46,5 +52,11 @@ char *read_args(int argc, char *argv[]) {
 
   free(pwd);
 
-  return path;
+  struct EmuConfig *conf = malloc(sizeof(struct EmuConfig));
+
+  conf->bin_path = path;
+  conf->bin_size = 500; // TODO: get image size
+  conf->mem_size = mem_size;
+
+  return conf;
 }
