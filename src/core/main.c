@@ -1,47 +1,13 @@
-#include "args.h"
-#include "config.h"
+#include <core/main.h>
+
+#include <config/args.h>
+#include <config/config.h>
+#include <cpu/cpu.h>
+#include <decode/decode.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-
-typedef struct {
-  uint32_t eax;
-  uint32_t ebx;
-  uint32_t ecx;
-  uint32_t edx;
-  uint32_t eip;
-  uint32_t eflags;
-
-  uint8_t *memory;
-} CPU;
-
-typedef struct Instruction {
-  uint8_t opcode[15];
-  void (*exec)(CPU *, struct Instruction *);
-} Instruction;
-
-void exec_nop(CPU *cpu, Instruction *ins) {
-  // NOP does nothing
-  (void)cpu;
-  (void)ins;
-}
-
-uint8_t fetch8(CPU *cpu) { return cpu->memory[cpu->eip++]; }
-
-Instruction decode(CPU *cpu) {
-  Instruction ins = {0};
-
-  ins.opcode[0] = fetch8(cpu);
-
-  switch (ins.opcode[0]) {
-  case 0x90:
-    ins.exec = &exec_nop;
-    break;
-  }
-
-  return ins;
-}
 
 int main(int argc, char *argv[]) {
   struct EmuConfig *conf = read_args(argc, argv);
