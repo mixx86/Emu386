@@ -1,5 +1,15 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Wpedantic
+DEBUG_FLAGS = -O0 -g
+RELEASE_FLAGS = -O2 -g
+
+BUILD ?= debug
+
+ifeq ($(BUILD),release)
+CFLAGS += $(RELEASE_FLAGS)
+else
+CFLAGS += $(DEBUG_FLAGS)
+endif
 
 INCLUDE_ROOT = include
 INCLUDE_DIRS = -I$(INCLUDE_ROOT) \

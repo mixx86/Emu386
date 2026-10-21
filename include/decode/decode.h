@@ -1,8 +1,8 @@
 #ifndef DECODE_H
 #define DECODE_H
 
+#include "memory/memory.h"
 #include <stdint.h>
-
 #include <cpu/cpu.h>
 
 typedef struct Instruction {
@@ -10,6 +10,6 @@ typedef struct Instruction {
   void (*exec)(CPU *, struct Instruction *);
 } Instruction;
 
-Instruction decode(CPU *cpu);
+Instruction decode(CPU *cpu, Memory *mem);
 
 #endif /* DECODE_H */

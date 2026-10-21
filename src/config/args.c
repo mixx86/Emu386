@@ -2,24 +2,31 @@
 
 #include <config/config.h>
 #include <stdint.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 struct EmuConfig *read_args(int argc, char *argv[]) {
   enum { CHARACTER_MODE, WORD_MODE, LINE_MODE } mode = CHARACTER_MODE;
-  int mem_size = 4096; /* 4KB by default */
+  size_t mem_size = 4096; /* 4KB by default */
 
   int opt;
   while ((opt = getopt(argc, argv, "ilm:w")) != -1) {
     switch (opt) {
     case 'm':
-      if (optarg == NULL) {
-        fprintf(stderr, "Usage: %s [-ilm:w] [file...]\n", argv[0]);
+      char *end;
+      errno = 0;
+
+      unsigned long long value = strtoull(optarg, &end, 10);
+
+      if (errno != 0 || end == optarg || *end != '\0' ||
+        value == 0 || value > SIZE_MAX) {
+        fprintf(stderr, "Invalid memory size: %s\n", optarg);
         exit(EXIT_FAILURE);
       }
-      mem_size = (int)*optarg;
-      break;
+
+      mem_size = (size_t)value;
     case 'l':
       mode = LINE_MODE;
       break;
